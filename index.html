@@ -3,250 +3,503 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏫 Svenska Förskolor Karta - Interaktiv 3D Karta</title>
+    <title>Förskolor i Sverige - Hitta och jämför förskolor</title>
     
     <!-- Mapbox CSS -->
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
     
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            /* Swedish nature palette */
+            --forest: 142 76% 36%;
+            --lake: 200 85% 45%;
+            --sky: 210 100% 90%;
+            --mountain: 220 15% 65%;
+            --meadow: 84 65% 55%;
+            --nordic-blue: 214 100% 50%;
+            --nordic-light: 210 30% 96%;
+            
+            --background: 216 20% 99%;
+            --foreground: 224 71% 4%;
+            --card: 0 0% 100%;
+            --card-foreground: 224 71% 4%;
+            --primary: 0 0% 20%;
+            --primary-foreground: 0 0% 100%;
+            --secondary: 210 30% 96%;
+            --muted: 210 30% 94%;
+            --muted-foreground: 215 20% 45%;
+            --border: 214 25% 88%;
+            --radius: 16px;
+            
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, hsl(var(--forest)) 0%, hsl(var(--lake)) 100%);
+            --gradient-nordic: linear-gradient(180deg, hsl(var(--sky)) 0%, hsl(var(--nordic-light)) 100%);
+            --gradient-hero: linear-gradient(135deg, hsl(var(--forest)) 0%, hsl(var(--lake)) 50%, hsl(var(--sky)) 100%);
+            
+            /* Shadows */
+            --shadow-nordic: 0 10px 40px -12px hsla(var(--forest), 0.25);
+            --shadow-soft: 0 2px 12px -4px hsla(var(--foreground), 0.12);
+            --shadow-elegant: 0 8px 32px -8px hsla(var(--primary), 0.15);
+        }
+        
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f8fafc;
-            color: #1e293b;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(to bottom right, hsl(var(--background)), hsl(var(--secondary)));
+            color: hsl(var(--foreground));
+            overflow-x: hidden;
         }
-        
+
+        .glass-nav {
+            background: hsla(var(--background), 0.95);
+            backdrop-filter: blur(28px) saturate(200%);
+            -webkit-backdrop-filter: blur(28px) saturate(200%);
+            border-bottom: 1px solid hsla(var(--border), 0.4);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px) saturate(120%);
+            -webkit-backdrop-filter: blur(20px) saturate(120%);
+            border: 1px solid rgba(200, 200, 200, 0.3);
+            box-shadow: var(--shadow-soft);
+            border-radius: var(--radius);
+        }
+
+        .glass-card {
+            background: hsla(var(--card), 0.9);
+            backdrop-filter: blur(16px) saturate(160%);
+            -webkit-backdrop-filter: blur(16px) saturate(160%);
+            border: 1px solid hsla(var(--border), 0.3);
+            box-shadow: var(--shadow-soft);
+            border-radius: var(--radius);
+        }
+
+        .text-gradient {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-nordic);
+        }
+
+        /* Header */
         .header {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 40;
+            padding: 1.5rem 2rem;
         }
-        
-        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
-        .header p { font-size: 1.2em; opacity: 0.9; }
-        
-        .main-container {
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
-            height: calc(100vh - 120px);
+            align-items: center;
+            justify-content: space-between;
         }
-        
-        .sidebar {
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .logo {
+            width: 3.5rem;
+            height: 3.5rem;
+            background: var(--gradient-primary);
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            box-shadow: var(--shadow-nordic);
+        }
+
+        .title-section h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+        }
+
+        .title-section p {
+            color: hsl(var(--muted-foreground));
+            font-weight: 500;
+        }
+
+        /* Search Bar */
+        .search-container {
+            position: absolute;
+            top: 8rem;
+            left: 2rem;
+            z-index: 30;
             width: 400px;
-            background: white;
-            border-right: 1px solid #e2e8f0;
-            overflow-y: auto;
-            box-shadow: 2px 0 4px rgba(0,0,0,0.1);
         }
-        
-        .search-section {
-            padding: 20px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        
-        .search-input {
+
+        .search-box {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.2s;
+            padding: 1rem 1.25rem;
+            border: 2px solid hsla(var(--border), 0.3);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            background: hsla(var(--background), 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-elegant);
+            transition: all 0.3s ease;
         }
-        
-        .search-input:focus {
+
+        .search-box:focus {
             outline: none;
-            border-color: #3b82f6;
+            border-color: hsl(var(--nordic-blue));
+            box-shadow: 0 0 0 3px hsla(var(--nordic-blue), 0.1);
         }
-        
-        .stats-section {
-            padding: 20px;
-            background: #f8fafc;
-            border-bottom: 1px solid #e2e8f0;
+
+        /* Sidebar Panel */
+        .sidebar-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 400px;
+            height: 100vh;
+            background: hsla(var(--card), 0.95);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-left: 1px solid hsla(var(--border), 0.3);
+            box-shadow: var(--shadow-nordic);
+            z-index: 20;
+            overflow-y: auto;
+            padding: 2rem;
         }
-        
-        .stat-grid {
+
+        .sidebar-header {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 15px;
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
-        
-        .stat-item {
+
+        .stat-card {
             text-align: center;
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
+            padding: 1.5rem 1rem;
+            background: hsla(var(--secondary), 0.5);
+            border-radius: 12px;
+            border: 1px solid hsla(var(--border), 0.3);
         }
-        
+
         .stat-number {
-            font-size: 2em;
+            font-size: 2rem;
             font-weight: bold;
-            color: #3b82f6;
+            color: hsl(var(--nordic-blue));
+            margin-bottom: 0.5rem;
         }
-        
+
+        .stat-label {
+            color: hsl(var(--muted-foreground));
+            font-size: 0.9rem;
+        }
+
+        /* Preschool List */
+        .preschool-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .preschool-item {
+            padding: 1.25rem;
+            background: hsla(var(--background), 0.8);
+            border: 1px solid hsla(var(--border), 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .preschool-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-elegant);
+            border-color: hsl(var(--nordic-blue));
+        }
+
+        .preschool-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: hsl(var(--foreground));
+            margin-bottom: 0.5rem;
+        }
+
+        .preschool-info {
+            color: hsl(var(--muted-foreground));
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .preschool-rating {
+            background: hsl(var(--meadow));
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Map Container */
         .map-container {
-            flex: 1;
             position: relative;
+            height: 100vh;
+            width: calc(100% - 400px);
         }
-        
+
         #map {
             width: 100%;
             height: 100%;
         }
-        
+
         .loading-overlay {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(255,255,255,0.9);
+            background: hsla(var(--background), 0.95);
+            backdrop-filter: blur(20px);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2em;
             z-index: 1000;
-        }
-        
-        .preschool-list {
-            padding: 20px;
-        }
-        
-        .preschool-item {
-            padding: 15px;
-            border-bottom: 1px solid #e2e8f0;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        
-        .preschool-item:hover {
-            background: #f1f5f9;
-        }
-        
-        .preschool-name {
-            font-weight: bold;
-            color: #1e293b;
-            margin-bottom: 5px;
-        }
-        
-        .preschool-info {
-            color: #64748b;
-            font-size: 0.9em;
-        }
-        
-        .controls {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 100;
-        }
-        
-        .control-button {
-            background: white;
-            border: 1px solid #e2e8f0;
-            padding: 10px 15px;
-            border-radius: 6px;
-            margin-left: 10px;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .control-button:hover {
-            background: #f8fafc;
-        }
-        
-        @media (max-width: 768px) {
-            .main-container { flex-direction: column; }
-            .sidebar { width: 100%; height: 300px; }
-            .map-container { height: 400px; }
+            flex-direction: column;
+            gap: 1rem;
         }
 
-        .success-message {
-            background: #dcfce7;
-            border: 1px solid #16a34a;
-            color: #15803d;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px;
+        .loading-spinner {
+            width: 3rem;
+            height: 3rem;
+            border: 4px solid hsla(var(--nordic-blue), 0.2);
+            border-top: 4px solid hsl(var(--nordic-blue));
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: hsl(var(--foreground));
+        }
+
+        .loading-subtext {
+            color: hsl(var(--muted-foreground));
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Map Controls */
+        .map-controls {
+            position: absolute;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .control-button {
+            background: hsla(var(--background), 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid hsla(var(--border), 0.3);
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: hsl(var(--foreground));
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .control-button:hover {
+            background: hsla(var(--card), 0.98);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-elegant);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 1rem;
+            }
+
+            .title-section h1 {
+                font-size: 1.5rem;
+            }
+
+            .search-container {
+                position: relative;
+                top: 0;
+                left: 0;
+                width: 100%;
+                padding: 0 1rem;
+                margin: 1rem 0;
+            }
+
+            .sidebar-panel {
+                position: relative;
+                width: 100%;
+                height: auto;
+                max-height: 50vh;
+                border-left: none;
+                border-top: 1px solid hsla(var(--border), 0.3);
+            }
+
+            .map-container {
+                width: 100%;
+                height: 50vh;
+            }
+
+            .map-controls {
+                top: 1rem;
+                left: 1rem;
+                transform: none;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 12px;
+            margin: 1rem;
             text-align: center;
+        }
+
+        .success-indicator {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            border: 1px solid #6ee7b7;
+            color: #065f46;
+            padding: 1rem;
+            border-radius: 12px;
+            margin: 1rem;
+            text-align: center;
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🏫 Svenska Förskolor Karta</h1>
-        <p>Interaktiv 3D-karta över svenska förskolor med omfattande statistik</p>
-    </div>
-
-    <div class="success-message">
-        ✅ <strong>Siten laddad framgångsrikt!</strong> Kartan initialiseras...
-    </div>
-
-    <div class="main-container">
-        <div class="sidebar">
-            <div class="search-section">
-                <input type="text" class="search-input" placeholder="Sök förskola eller kommun..." id="searchInput">
-            </div>
-            
-            <div class="stats-section">
-                <h3>📊 Statistik</h3>
-                <div class="stat-grid">
-                    <div class="stat-item">
-                        <div class="stat-number" id="totalCount">540+</div>
-                        <div>Förskolor</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="municipalityCount">290</div>
-                        <div>Kommuner</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="averageRating">4.2</div>
-                        <div>Medelbetyg</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="withCoordinates">420</div>
-                        <div>Med Koordinater</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="preschool-list" id="preschoolList">
-                <div class="preschool-item">
-                    <div class="preschool-name">🏫 Läsanden Förskola</div>
-                    <div class="preschool-info">Stockholm • 45 barn • Kommunal</div>
-                </div>
-                <div class="preschool-item">
-                    <div class="preschool-name">🌟 Solrosen Förskola</div>
-                    <div class="preschool-info">Göteborg • 38 barn • Privat • ⭐ 4.5</div>
-                </div>
-                <div class="preschool-item">
-                    <div class="preschool-name">🌈 Regnbågen Förskola</div>
-                    <div class="preschool-info">Malmö • 52 barn • Kooperativ • ⭐ 4.8</div>
-                </div>
-                <div class="preschool-item">
-                    <div class="preschool-name">🐻 Björngården</div>
-                    <div class="preschool-info">Uppsala • 41 barn • Kommunal • ⭐ 4.1</div>
-                </div>
-                <div class="preschool-item">
-                    <div class="preschool-name">🌸 Körsbärsblomman</div>
-                    <div class="preschool-info">Lund • 29 barn • Privat • ⭐ 4.6</div>
+    <!-- Header -->
+    <header class="header glass-nav">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo hover-lift">🏫</div>
+                <div class="title-section">
+                    <h1 class="text-gradient">Förskolor i Sverige</h1>
+                    <p>Hitta och jämför förskolor – i hela landet</p>
                 </div>
             </div>
         </div>
+    </header>
 
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" class="search-box" placeholder="🔍 Sök förskola eller kommun..." id="searchInput">
+    </div>
+
+    <!-- Main Content -->
+    <div style="display: flex;">
+        <!-- Map Container -->
         <div class="map-container">
             <div id="map"></div>
             <div class="loading-overlay" id="loadingOverlay">
-                🗺️ Laddar interaktiv 3D-karta...
+                <div class="loading-spinner"></div>
+                <div class="loading-text">Laddar Sveriges förskolor...</div>
+                <div class="loading-subtext">Hämtar data från Supabase-databasen</div>
             </div>
             
-            <div class="controls">
-                <button class="control-button" onclick="toggleView()">🔄 2D/3D</button>
-                <button class="control-button" onclick="centerSweden()">🇸🇪 Centrera</button>
-                <button class="control-button" onclick="toggleHeatmap()">🔥 Värmekartor</button>
+            <!-- Map Controls -->
+            <div class="map-controls">
+                <button class="control-button" onclick="toggleView()">
+                    <span id="viewIcon">🌍</span> <span id="viewText">2D/3D</span>
+                </button>
+                <button class="control-button" onclick="centerSweden()">
+                    <span>🇸🇪</span> Centrera Sverige
+                </button>
+                <button class="control-button" onclick="toggleHeatmap()">
+                    <span>🔥</span> Värmekartor
+                </button>
+            </div>
+        </div>
+
+        <!-- Sidebar Panel -->
+        <div class="sidebar-panel">
+            <div class="sidebar-header">
+                <h2>📊 Förskolestatistik</h2>
+                <p>Realtidsdata från hela Sverige</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalCount">540+</div>
+                    <div class="stat-label">Förskolor</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="municipalityCount">290</div>
+                    <div class="stat-label">Kommuner</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="averageRating">4.2</div>
+                    <div class="stat-label">Medelbetyg</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="withCoordinates">85%</div>
+                    <div class="stat-label">Med Koordinater</div>
+                </div>
+            </div>
+
+            <h3 style="margin-bottom: 1rem; color: hsl(var(--foreground));">🏫 Förskolor</h3>
+            <div class="preschool-list" id="preschoolList">
+                <!-- Will be populated by JavaScript -->
             </div>
         </div>
     </div>
@@ -254,18 +507,28 @@
     <!-- Mapbox JS -->
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
     
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <script>
-        console.log('🚀 Svenska Förskolor Karta startar - WORKING VERSION!');
+        console.log('🚀 Svenska Förskolor startar med riktig design...');
         
         // Mapbox setup
         mapboxgl.accessToken = 'pk.eyJ1Ijoic2tvZ3N0YWRpc2FrIiwiYSI6ImNtY3BhaXRpMjA0ZGcycHBqNHM4dmlwOW0ifQ.KKHGGPnrZVjNjDdITF-_bw';
         
+        // Supabase setup
+        const supabaseUrl = 'https://zfeqsdtddvelapbrwlol.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpmZXFzZHRkZHZlbGFwYnJ3bG9sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUxNTE1NzEsImV4cCI6MjA1MDcyNzU3MX0.TG9VTzI4QNp6fa2HQ_PiOlyHhGzwE5hU0xUFxzMIWbQ';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
         let map;
         let is3D = true;
         let showHeatmap = false;
-        
+        let preschoolData = [];
+        let markers = [];
+
         // Initialize map
-        function initMap() {
+        async function initMap() {
             try {
                 map = new mapboxgl.Map({
                     container: 'map',
@@ -276,56 +539,155 @@
                     bearing: 0
                 });
                 
-                map.on('load', () => {
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                    console.log('🗺️ Karta laddad framgångsrikt');
+                map.on('load', async () => {
+                    console.log('🗺️ Karta laddad, laddar förskoledata...');
                     
-                    // Add sample preschool markers
-                    addSampleMarkers();
+                    // Load preschool data from Supabase
+                    await loadPreschoolData();
                     
                     // Add 3D buildings
                     add3DBuildings();
+                    
+                    // Hide loading overlay
+                    document.getElementById('loadingOverlay').style.display = 'none';
                 });
                 
                 map.on('error', (e) => {
                     console.error('Map error:', e);
-                    document.getElementById('loadingOverlay').innerHTML = '❌ Kartfel: ' + e.error.message;
+                    showError('Kartfel: ' + e.error.message);
                 });
                 
             } catch (e) {
                 console.error('Init error:', e);
-                document.getElementById('loadingOverlay').innerHTML = '❌ Mapbox init fel: ' + e.message;
+                showError('Mapbox init fel: ' + e.message);
             }
         }
-        
-        // Add sample markers for demonstration
-        function addSampleMarkers() {
-            const samplePreschools = [
-                { name: 'Läsanden Förskola', coords: [18.0686, 59.3293], city: 'Stockholm' },
-                { name: 'Solrosen Förskola', coords: [11.9746, 57.7089], city: 'Göteborg' },
-                { name: 'Regnbågen Förskola', coords: [13.0038, 55.6050], city: 'Malmö' },
-                { name: 'Björngården', coords: [17.6389, 59.8586], city: 'Uppsala' },
-                { name: 'Körsbärsblomman', coords: [13.1923, 55.7047], city: 'Lund' }
-            ];
+
+        // Load preschool data from Supabase
+        async function loadPreschoolData() {
+            try {
+                console.log('📊 Hämtar data från Supabase...');
+                
+                const { data, error } = await supabase
+                    .from('forskoldata')
+                    .select('*')
+                    .limit(100); // Limit for performance
+                
+                if (error) {
+                    console.error('Supabase error:', error);
+                    showError('Databasfel: ' + error.message);
+                    return;
+                }
+                
+                console.log(`✅ Laddade ${data.length} förskolor från databasen`);
+                preschoolData = data;
+                
+                // Update statistics
+                updateStatistics();
+                
+                // Add markers to map
+                addRealMarkers();
+                
+                // Populate sidebar list
+                populatePreschoolList();
+                
+            } catch (e) {
+                console.error('Data loading error:', e);
+                showError('Fel vid laddning av data: ' + e.message);
+            }
+        }
+
+        // Update statistics with real data
+        function updateStatistics() {
+            if (preschoolData.length > 0) {
+                document.getElementById('totalCount').textContent = preschoolData.length + '+';
+                
+                // Count unique municipalities
+                const uniqueMunicipalities = new Set(preschoolData.map(p => p.kommun_namn)).size;
+                document.getElementById('municipalityCount').textContent = uniqueMunicipalities;
+                
+                // Calculate average rating (mock for now)
+                document.getElementById('averageRating').textContent = '4.2';
+                
+                // Calculate percentage with coordinates
+                const withCoords = preschoolData.filter(p => p.latitude && p.longitude).length;
+                const percentage = Math.round((withCoords / preschoolData.length) * 100);
+                document.getElementById('withCoordinates').textContent = percentage + '%';
+            }
+        }
+
+        // Add real markers from Supabase data
+        function addRealMarkers() {
+            // Clear existing markers
+            markers.forEach(marker => marker.remove());
+            markers = [];
             
-            samplePreschools.forEach(preschool => {
-                const marker = new mapboxgl.Marker({
-                    color: '#3b82f6',
-                    scale: 0.8
-                })
-                .setLngLat(preschool.coords)
-                .setPopup(new mapboxgl.Popup().setHTML(`
-                    <h3>🏫 ${preschool.name}</h3>
-                    <p><strong>Stad:</strong> ${preschool.city}</p>
-                    <p><strong>Typ:</strong> Kommunal förskola</p>
-                    <p><strong>Status:</strong> Demo-data</p>
-                `))
-                .addTo(map);
+            preschoolData.forEach((preschool, index) => {
+                if (preschool.latitude && preschool.longitude) {
+                    const marker = new mapboxgl.Marker({
+                        color: '#2563eb',
+                        scale: 0.8
+                    })
+                    .setLngLat([preschool.longitude, preschool.latitude])
+                    .setPopup(new mapboxgl.Popup().setHTML(`
+                        <div style="padding: 1rem; max-width: 300px;">
+                            <h3 style="margin: 0 0 0.5rem 0; color: #1e40af; font-size: 1.1rem;">🏫 ${preschool.forskola_namn || 'Förskola'}</h3>
+                            <p style="margin: 0.25rem 0; color: #64748b;"><strong>Kommun:</strong> ${preschool.kommun_namn}</p>
+                            <p style="margin: 0.25rem 0; color: #64748b;"><strong>Typ:</strong> ${preschool.data_typ || 'Förskola'}</p>
+                            <p style="margin: 0.25rem 0; color: #64748b;"><strong>Personal:</strong> ${preschool.andel_forskollare_procent || 'N/A'}% förskollärare</p>
+                            ${preschool.andel_legitimation_procent ? `<p style="margin: 0.25rem 0; color: #64748b;"><strong>Legitimerad personal:</strong> ${preschool.andel_legitimation_procent}%</p>` : ''}
+                        </div>
+                    `))
+                    .addTo(map);
+                    
+                    markers.push(marker);
+                }
             });
             
-            console.log('✅ Sample markers added successfully');
+            console.log(`✅ Lade till ${markers.length} markörer på kartan`);
         }
-        
+
+        // Populate sidebar list with real data
+        function populatePreschoolList() {
+            const listContainer = document.getElementById('preschoolList');
+            listContainer.innerHTML = '';
+            
+            // Show first 20 preschools
+            const displayData = preschoolData.slice(0, 20);
+            
+            displayData.forEach(preschool => {
+                const item = document.createElement('div');
+                item.className = 'preschool-item';
+                
+                const name = preschool.forskola_namn || `Förskola i ${preschool.kommun_namn}`;
+                const municipality = preschool.kommun_namn || 'Okänd kommun';
+                const type = preschool.data_typ || 'Förskola';
+                const teachers = preschool.andel_forskollare_procent;
+                
+                item.innerHTML = `
+                    <div class="preschool-name">🏫 ${name}</div>
+                    <div class="preschool-info">
+                        <span>${municipality}</span>
+                        ${teachers ? `<span class="preschool-rating">${teachers}% förskollärare</span>` : ''}
+                        <span>${type}</span>
+                    </div>
+                `;
+                
+                // Add click handler to fly to preschool
+                item.addEventListener('click', () => {
+                    if (preschool.latitude && preschool.longitude) {
+                        map.flyTo({
+                            center: [preschool.longitude, preschool.latitude],
+                            zoom: 12,
+                            duration: 2000
+                        });
+                    }
+                });
+                
+                listContainer.appendChild(item);
+            });
+        }
+
         // Add 3D buildings
         function add3DBuildings() {
             map.addLayer({
@@ -354,17 +716,23 @@
                     'fill-extrusion-opacity': 0.6
                 }
             });
-            console.log('✅ 3D buildings added successfully');
         }
-        
+
         // Control functions
         function toggleView() {
             is3D = !is3D;
+            const viewIcon = document.getElementById('viewIcon');
+            const viewText = document.getElementById('viewText');
+            
             map.easeTo({
                 pitch: is3D ? 45 : 0,
                 bearing: is3D ? -17.6 : 0,
                 duration: 1000
             });
+            
+            viewIcon.textContent = is3D ? '🌍' : '🗺️';
+            viewText.textContent = is3D ? '3D Vy' : '2D Vy';
+            
             console.log('View toggled to:', is3D ? '3D' : '2D');
         }
         
@@ -384,28 +752,89 @@
             console.log('Heatmap toggle:', showHeatmap);
             // Heatmap implementation would go here
         }
-        
+
         // Search functionality
         document.getElementById('searchInput').addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
             console.log('Sökning:', searchTerm);
-            // Search implementation would go here
+            
+            if (searchTerm.length > 2) {
+                searchPreschools(searchTerm);
+            } else {
+                populatePreschoolList(); // Reset to full list
+            }
         });
-        
+
+        function searchPreschools(searchTerm) {
+            const filtered = preschoolData.filter(preschool => 
+                (preschool.forskola_namn && preschool.forskola_namn.toLowerCase().includes(searchTerm)) ||
+                (preschool.kommun_namn && preschool.kommun_namn.toLowerCase().includes(searchTerm))
+            );
+            
+            const listContainer = document.getElementById('preschoolList');
+            listContainer.innerHTML = '';
+            
+            if (filtered.length === 0) {
+                listContainer.innerHTML = '<div style="text-align: center; padding: 2rem; color: hsl(var(--muted-foreground));">Inga förskolor hittades för "' + searchTerm + '"</div>';
+                return;
+            }
+            
+            filtered.slice(0, 20).forEach(preschool => {
+                const item = document.createElement('div');
+                item.className = 'preschool-item';
+                
+                const name = preschool.forskola_namn || `Förskola i ${preschool.kommun_namn}`;
+                const municipality = preschool.kommun_namn || 'Okänd kommun';
+                const type = preschool.data_typ || 'Förskola';
+                const teachers = preschool.andel_forskollare_procent;
+                
+                item.innerHTML = `
+                    <div class="preschool-name">🏫 ${name}</div>
+                    <div class="preschool-info">
+                        <span>${municipality}</span>
+                        ${teachers ? `<span class="preschool-rating">${teachers}% förskollärare</span>` : ''}
+                        <span>${type}</span>
+                    </div>
+                `;
+                
+                item.addEventListener('click', () => {
+                    if (preschool.latitude && preschool.longitude) {
+                        map.flyTo({
+                            center: [preschool.longitude, preschool.latitude],
+                            zoom: 12,
+                            duration: 2000
+                        });
+                    }
+                });
+                
+                listContainer.appendChild(item);
+            });
+        }
+
+        function showError(message) {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.innerHTML = `
+                <div class="error-message">
+                    <h3>❌ Ett fel uppstod</h3>
+                    <p>${message}</p>
+                    <p style="margin-top: 1rem;"><a href="https://fosko.lovable.app" target="_blank" style="color: #2563eb;">Prova live demo på Lovable</a></p>
+                </div>
+            `;
+        }
+
         // Initialize when page loads
         window.addEventListener('load', () => {
-            console.log('🚀 Svenska Förskolor Karta startar...');
-            setTimeout(initMap, 100); // Small delay to ensure DOM is ready
+            console.log('🚀 Svenska Förskolor startar med riktig design och data...');
+            setTimeout(initMap, 500);
         });
-        
+
         // Error handling
         window.addEventListener('error', (e) => {
             console.error('❌ Global error:', e.error);
-            document.getElementById('loadingOverlay').innerHTML = 
-                '❌ Fel vid laddning. <br><a href="https://fosko.lovable.app" target="_blank">Prova live demo</a>';
+            showError('Applikationsfel: ' + e.error.message);
         });
         
-        console.log('✅ Svenska Förskolor Karta script loaded successfully');
+        console.log('✅ Svenska Förskolor script loaded successfully with real design and Supabase integration');
     </script>
 </body>
 </html>
