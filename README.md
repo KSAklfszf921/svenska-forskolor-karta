@@ -1,171 +1,163 @@
- # Swedish Preschool Map 🏫
+# 🏫 Svenska Förskolor Karta
 
-En interaktiv karttjänst för att utforska förskolors i Sverige med 3D-visualisering och omfattande statistik.
+En interaktiv 3D-karta för att upptäcka och jämföra förskolor i Sverige med omfattande statistik och funktioner.
 
-## 🚀 Funktioner
+![Svenska Förskolor](https://img.shields.io/badge/Förskolor-540+-brightgreen)
+![React](https://img.shields.io/badge/React-18+-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue)
+![Mapbox](https://img.shields.io/badge/Mapbox-GL-orange)
 
-- **3D Interaktiv Karta** - Utforska förskolor med Mapbox 3D-rendering
-- **Omfattande Statistik** - Personaltäthet, lärarexamen, betyg och mer
-- **Smart Filtrering** - Sök efter kommun, betyg, personalstatistik
-- **Google Integration** - Betyg, bilder och kontaktinformation
-- **Real-time Data** - Uppdaterad data från Skolverket
+## 🌟 Funktioner
 
-## 🛠️ Teknisk Stack
+### 🗺️ Interaktiv 3D-Karta
+- **Mapbox GL** integration med anpassad styling
+- **Förskolemarkörer** med kluster-funktionalitet
+- **3D-byggnadsextrudering** för realistisk visualisering
+- **Värmekartor** för olika statistiska data
+- **Interaktiva popups** med detaljerad information
 
-- **Frontend**: React + TypeScript + Vite
-- **UI**: Tailwind CSS + shadcn/ui
-- **Karta**: Mapbox GL JS med 3D-terrain
-- **Backend**: Supabase (databas + edge functions)
-- **Deployment**: GitHub Actions → GitHub Pages / Netlify / Vercel
+### 📊 Omfattande Statistik
+- **Kommunjämförelser** med visuell data
+- **Statistiska överlagringar** (personaltäthet, kvalifikationer, etc.)
+- **Filtersystem** efter kommun, betyg, etc.
+- **Realtidsdata** från Supabase
 
-## 📦 Installation
+### 🔍 Smart Sökning & Upptäckt
+- **Intelligent sökfält** med autoifyllning
+- **Geografisk filtrering** baserat på plats
+- **Favoritssystem** för sparade förskolor
+- **Jämförelseverktyg** mellan olika förskolor
 
-### Lokalt Development
+### 📱 Responsiv Design
+- **Mobiloptimerad** interface
+- **Pekskärmsvänliga** kartkontroller
+- **Adaptiva layouter** för alla skärmstorlekar
+- **Mörkt/ljust läge** support
 
+## 🚀 Kom Igång
+
+### Förutsättningar
+- Node.js 18+
+- npm eller yarn
+- Git
+
+### Installation
 ```bash
-git clone https://github.com/your-username/swedish-preschool-map.git
-cd swedish-preschool-map
+# Klona repositoriet
+git clone https://github.com/KSAklfszf921/svenska-forskolor-karta.git
+cd svenska-forskolor-karta
+
+# Installera beroenden
 npm install
+
+# Starta utvecklingsserver
 npm run dev
 ```
 
-### Environment Setup
+### Miljövariabler
+Skapa `.env.local` fil:
+```env
+# Supabase Configuration
+VITE_SUPABASE_URL=https://zfeqsdtddvelapbrwlol.supabase.co
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-Kopiera `.env.example` till `.env` och konfigurera:
+# Mapbox (för 3D-kartor)
+VITE_MAPBOX_TOKEN=your_mapbox_token
 
-```bash
-cp .env.example .env
+# Google APIs (valfritt - för förbättrad data)
+VITE_GOOGLE_MAPS_API_KEY=your_google_api_key
 ```
 
-Fyll i dina Supabase-uppgifter i `.env`.
+## 📊 Data Källor
+
+- **Skolverket** - Officiell svensk förskoledata (540+ förskolor)
+- **Google Places API** - Recensioner, betyg, kontaktinfo
+- **Supabase** - Realtids databas och backend
+- **OpenStreetMap/Mapbox** - Kartdata och geografisk information
+
+## 🛠️ Teknisk Stack
+
+### Frontend
+- **React 18** - Modern UI-bibliotek
+- **TypeScript** - Typesäkerhet och utvecklarupplevelse
+- **Vite** - Snabb byggprocess och utveckling
+- **Tailwind CSS** - Utility-first CSS framework
+- **shadcn/ui** - Komponentbibliotek
+
+### Backend & Data
+- **Supabase** - Backend-as-a-Service
+- **PostgreSQL** - Relationsdatabas
+- **Edge Functions** - Serverless funktioner
+
+### Kartor & Visualisering
+- **Mapbox GL JS** - Interaktiva 3D-kartor
+- **Custom Layers** - Specialiserade visualiseringar
+- **Clustering** - Optimerad prestanda för stora dataset
+
+## 📁 Projektstruktur
+
+```
+svenska-forskolor-karta/
+├── src/
+│   ├── components/          # React-komponenter
+│   │   ├── Map3D.tsx       # Huvud 3D-kartkomponent
+│   │   ├── PreschoolDetails.tsx # Detaljerad förskoleinformation
+│   │   ├── StatisticsPanel.tsx  # Datavisualisering
+│   │   └── ui/             # Återanvändbara UI-komponenter
+│   ├── hooks/              # Custom React hooks
+│   ├── stores/             # Zustand state management
+│   ├── integrations/       # Supabase integration
+│   └── utils/              # Hjälpfunktioner
+├── supabase/
+│   ├── migrations/         # Databasschema
+│   ├── functions/          # Edge-funktioner
+│   └── config.toml         # Supabase-konfiguration
+├── public/                 # Statiska filer
+└── .github/workflows/      # GitHub Actions
+```
 
 ## 🚀 Deployment
 
 ### GitHub Pages (Automatisk)
+Sidan deployas automatiskt till GitHub Pages när kod pushes till main-branchen:
+- **URL**: https://ksaklfszf921.github.io/svenska-forskolor-karta/
+- **Workflow**: `.github/workflows/build-deploy.yml`
 
-1. Forka repot
-2. Aktivera GitHub Pages i repo settings
-3. Push till `main` branch - deployment sker automatiskt via GitHub Actions
-
-### Netlify
-
-1. Koppla ditt GitHub repo till Netlify
-2. Build command: `npm run build`
-3. Publish directory: `dist`
-
-### Vercel
-
-1. Importera ditt GitHub repo till Vercel
-2. Framework preset: Vite
-3. Deployment sker automatiskt
-
-## 🔐 API Keys & Secrets
-
-För produktion behöver följande konfigureras i Supabase Edge Function Secrets:
-
-- `MAPBOX_TOKEN` - Din Mapbox public token
-- `GOOGLE_GEOCODING_API_KEY` - Google Maps Geocoding API
-- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key
-
-### Hämta API Keys
-
-**Mapbox Token:**
-1. Gå till [mapbox.com](https://mapbox.com)
-2. Skapa konto och navigera till "Tokens"
-3. Kopiera din "Default public token"
-
-**Google Geocoding API:**
-1. Gå till [Google Cloud Console](https://console.cloud.google.com)
-2. Aktivera "Geocoding API"
-3. Skapa API key under "Credentials"
-
-## 📊 Datastruktur
-
-Applikationen använder data från Skolverket och Google Places API:
-
-### Förskolor (Huvudtabell)
-- Skolverkets officiella data
-- Geografiska koordinater
-- Personalstatistik
-- Barn- och gruppinformation
-
-### Google Data (Berikad)
-- Betyg och recensioner
-- Kontaktinformation
-- Bilder från Google Places
-- Street View integration
-
-## 🔧 Utveckling
-
-### Viktiga Filer
-
-- `src/components/Map3D.tsx` - Huvudkartkomponent
-- `src/stores/mapStore.ts` - Global state management
-- `supabase/functions/` - Backend edge functions
-- `src/components/enhanced/` - Förbättrade UI-komponenter
-
-### Kodstruktur
-
-```
-src/
-├── components/          # React komponenter
-├── stores/             # Zustand state management
-├── utils/              # Hjälpfunktioner
-├── hooks/              # Custom React hooks
-└── integrations/       # Supabase integration
-
-supabase/
-├── functions/          # Edge functions
-└── migrations/         # Database migrations
-```
-
-## 🐛 Troubleshooting
-
-### Vanliga Problem
-
-**Kartan laddar inte:**
-- Kontrollera Mapbox token i browser dev tools
-- Verifiera att token har rätt scope
-
-**Geocoding fungerar inte:**
-- Kontrollera Google API key i Supabase secrets
-- Verifiera att Geocoding API är aktiverat
-
-**Build errors:**
-- Kör `npm ci` för clean install
-- Kontrollera Node.js version (rekommenderat: 18+)
-
-### Debug Tools
-
+### Manuell Byggprocess
 ```bash
-# Visa console logs
-npm run dev
-
-# Build för produktion
+# Bygg för produktion
 npm run build
 
-# Preview production build
+# Förhandsgranska byggd version
 npm run preview
 ```
 
-## 📈 Performance
+## 📈 Prestandaoptimering
 
-- **Lazy loading** för bilder och komponenter
-- **Code splitting** för optimal bundle size
-- **Caching** av API-anrop och statisk data
-- **CDN** för assets via GitHub Pages/Netlify
+- **Koddelning** - Mapbox, Supabase, vendor chunks separerade
+- **Bildoptimering** - Korrekta format och storlekar
+- **Lazy loading** - Komponenter och data laddas vid behov
+- **Cachingstrategier** - För API-svar och kartdata
+
+## 🛡️ Säkerhet
+
+- **Miljövariabler** - Inga hemligheter i koden
+- **RLS-policyer** - Databasåtkomstkontroll
+- **API rate limiting** - Google/Mapbox användningsgränser
+- **Inputvalidering** - Säkra sök- och filterinmatningar
 
 ## 🤝 Bidrag
 
-1. Forka projektet
-2. Skapa feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit dina ändringar (`git commit -m 'Add amazing feature'`)
-4. Push till branch (`git push origin feature/amazing-feature`)
+Bidrag är välkomna! Vänligen:
+1. Forka repositoriet
+2. Skapa en feature branch (`git checkout -b feature/AmazingFeature`)
+3. Committa dina ändringar (`git commit -m 'Add some AmazingFeature'`)
+4. Push till branchen (`git push origin feature/AmazingFeature`)
 5. Öppna en Pull Request
 
 ## 📄 Licens
 
-Detta projekt är licensierat under MIT License - se [LICENSE](LICENSE) filen för detaljer.
+Detta projekt är licensierat under MIT-licensen - se [LICENSE](LICENSE) filen för detaljer.
 
 ## 🙏 Acknowledgments
 
@@ -173,9 +165,16 @@ Detta projekt är licensierat under MIT License - se [LICENSE](LICENSE) filen f�
 - **Mapbox** för 3D-kartteknologi
 - **Supabase** för backend-infrastruktur
 - **Google Places API** för berikad data
+- **React Community** för fantastiska verktyg och bibliotek
+
+## 📞 Kontakt
+
+**Live Demo**: https://ksaklfszf921.github.io/svenska-forskolor-karta/
+**Repository**: https://github.com/KSAklfszf921/svenska-forskolor-karta
+**Issues**: https://github.com/KSAklfszf921/svenska-forskolor-karta/issues
 
 ---
 
 Utvecklat med ❤️ för svenska föräldrar och förskolor.
 
-*Deployment test - GitHub Actions fix*
+*Upptäck, jämför och hitta den perfekta förskolan för ditt barn!*
