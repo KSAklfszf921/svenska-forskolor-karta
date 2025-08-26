@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Svenska Förskolor Karta - Interaktiv 3D Karta</title>
+    <title>🏫 Svenska Förskolor Karta - Interaktiv 3D Karta</title>
     
     <!-- Mapbox CSS -->
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
@@ -163,12 +163,26 @@
             .sidebar { width: 100%; height: 300px; }
             .map-container { height: 400px; }
         }
+
+        .success-message {
+            background: #dcfce7;
+            border: 1px solid #16a34a;
+            color: #15803d;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>🏫 Svenska Förskolor Karta</h1>
         <p>Interaktiv 3D-karta över svenska förskolor med omfattande statistik</p>
+    </div>
+
+    <div class="success-message">
+        ✅ <strong>Siten laddad framgångsrikt!</strong> Kartan initialiseras...
     </div>
 
     <div class="main-container">
@@ -241,6 +255,8 @@
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
     
     <script>
+        console.log('🚀 Svenska Förskolor Karta startar - WORKING VERSION!');
+        
         // Mapbox setup
         mapboxgl.accessToken = 'pk.eyJ1Ijoic2tvZ3N0YWRpc2FrIiwiYSI6ImNtY3BhaXRpMjA0ZGcycHBqNHM4dmlwOW0ifQ.KKHGGPnrZVjNjDdITF-_bw';
         
@@ -250,25 +266,36 @@
         
         // Initialize map
         function initMap() {
-            map = new mapboxgl.Map({
-                container: 'map',
-                style: 'mapbox://styles/mapbox/light-v11',
-                center: [15.5, 62.0], // Center of Sweden
-                zoom: 5.5,
-                pitch: 45,
-                bearing: 0
-            });
-            
-            map.on('load', () => {
-                document.getElementById('loadingOverlay').style.display = 'none';
-                console.log('🗺️ Karta laddad framgångsrikt');
+            try {
+                map = new mapboxgl.Map({
+                    container: 'map',
+                    style: 'mapbox://styles/mapbox/light-v11',
+                    center: [15.5, 62.0], // Center of Sweden
+                    zoom: 5.5,
+                    pitch: 45,
+                    bearing: 0
+                });
                 
-                // Add sample preschool markers
-                addSampleMarkers();
+                map.on('load', () => {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    console.log('🗺️ Karta laddad framgångsrikt');
+                    
+                    // Add sample preschool markers
+                    addSampleMarkers();
+                    
+                    // Add 3D buildings
+                    add3DBuildings();
+                });
                 
-                // Add 3D buildings
-                add3DBuildings();
-            });
+                map.on('error', (e) => {
+                    console.error('Map error:', e);
+                    document.getElementById('loadingOverlay').innerHTML = '❌ Kartfel: ' + e.error.message;
+                });
+                
+            } catch (e) {
+                console.error('Init error:', e);
+                document.getElementById('loadingOverlay').innerHTML = '❌ Mapbox init fel: ' + e.message;
+            }
         }
         
         // Add sample markers for demonstration
@@ -295,6 +322,8 @@
                 `))
                 .addTo(map);
             });
+            
+            console.log('✅ Sample markers added successfully');
         }
         
         // Add 3D buildings
@@ -325,6 +354,7 @@
                     'fill-extrusion-opacity': 0.6
                 }
             });
+            console.log('✅ 3D buildings added successfully');
         }
         
         // Control functions
@@ -335,6 +365,7 @@
                 bearing: is3D ? -17.6 : 0,
                 duration: 1000
             });
+            console.log('View toggled to:', is3D ? '3D' : '2D');
         }
         
         function centerSweden() {
@@ -345,12 +376,13 @@
                 bearing: 0,
                 duration: 2000
             });
+            console.log('Map centered on Sweden');
         }
         
         function toggleHeatmap() {
             showHeatmap = !showHeatmap;
-            // Heatmap implementation would go here
             console.log('Heatmap toggle:', showHeatmap);
+            // Heatmap implementation would go here
         }
         
         // Search functionality
@@ -363,17 +395,17 @@
         // Initialize when page loads
         window.addEventListener('load', () => {
             console.log('🚀 Svenska Förskolor Karta startar...');
-            initMap();
+            setTimeout(initMap, 100); // Small delay to ensure DOM is ready
         });
         
         // Error handling
         window.addEventListener('error', (e) => {
-            console.error('❌ Applikationsfel:', e.error);
+            console.error('❌ Global error:', e.error);
             document.getElementById('loadingOverlay').innerHTML = 
-                '❌ Fel vid laddning av karta. <br><a href="https://fosko.lovable.app">Prova live demo</a>';
+                '❌ Fel vid laddning. <br><a href="https://fosko.lovable.app" target="_blank">Prova live demo</a>';
         });
         
-        console.log('✅ Svenska Förskolor Karta initialiserad');
+        console.log('✅ Svenska Förskolor Karta script loaded successfully');
     </script>
 </body>
-</html><!-- FORCED REFRESH Tis 26 Aug 2025 14:59:47 CEST -->
+</html>
